@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  app:
+    container_name: pin-board
+#    build:
+#      context: ../
+#      dockerfile: deployment/Dockerfile
+    image: msdeluise/pin-board:1.0.0
+    ports:
+      - "8080:8080/tcp"
+    env_file: .env
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    restart: always
+    env_file: .env
