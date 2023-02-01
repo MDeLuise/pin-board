@@ -3,10 +3,13 @@ package com.github.mdeluise.pinboard.page;
 import com.github.mdeluise.pinboard.list.PageList;
 import com.github.mdeluise.pinboard.page.body.PageBody;
 import com.github.mdeluise.pinboard.tag.Tag;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -34,9 +37,27 @@ public class Page implements Serializable {
     private PageBody body;
     private Long pageBodyId;
     private String headerImgUrl;
-    @ManyToMany(mappedBy = "pages")
+    @ManyToMany(
+        cascade = {
+            CascadeType.PERSIST, CascadeType.MERGE
+        }
+    )
+    @JoinTable(
+        name = "page_tags",
+        joinColumns = @JoinColumn(name = "page_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
+    )
     private Set<Tag> tags = new HashSet<>();
-    @ManyToMany(mappedBy = "pages")
+    @ManyToMany(
+        cascade = {
+            CascadeType.PERSIST, CascadeType.MERGE
+        }
+    )
+    @JoinTable(
+        name = "page_page_lists",
+        joinColumns = @JoinColumn(name = "page_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "page_list_id", referencedColumnName = "id")
+    )
     private Set<PageList> lists = new HashSet<>();
 
 

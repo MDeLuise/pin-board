@@ -11,6 +11,7 @@ import com.github.mdeluise.pinboard.page.Page;
 import com.github.mdeluise.pinboard.page.PageService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -127,5 +128,12 @@ public class TagService extends AbstractCrudService<Tag, Long> {
         Tag tag = get(tagId);
         tag.removePage(page);
         repository.save(tag);
+    }
+
+
+    @PostAuthorize("hasRole('ADMIN') or hasAuthority('read:tag:' + #returnObject.id)")
+    public Tag getByName(String name) {
+        return ((TagRepository) repository).findByName(name)
+                                           .orElseThrow(() -> new EntityNotFoundException("name", name));
     }
 }

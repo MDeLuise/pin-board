@@ -1,13 +1,10 @@
 package com.github.mdeluise.pinboard.tag;
 
 import com.github.mdeluise.pinboard.page.Page;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -30,16 +27,7 @@ public class Tag {
     @Column(unique = true, nullable = false)
     @NotBlank
     private String name;
-    @ManyToMany(
-        cascade = {
-            CascadeType.PERSIST, CascadeType.MERGE
-        }
-    )
-    @JoinTable(
-        name = "page_tags",
-        joinColumns = @JoinColumn(name = "page_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
-    )
+    @ManyToMany(mappedBy = "tags")
     private Set<Page> pages = new HashSet<>();
 
 

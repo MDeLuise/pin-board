@@ -11,6 +11,7 @@ import com.github.mdeluise.pinboard.page.Page;
 import com.github.mdeluise.pinboard.page.PageService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -132,5 +133,12 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
         Page page = pageService.get(pageId);
         pageList.removePage(page);
         update(pageListId, pageList);
+    }
+
+
+    @PostAuthorize("hasRole('ADMIN') or hasAuthority('read:list:' + #returnObject.id)")
+    public PageList getByName(String name) {
+        return ((PageListRepository) repository).getByName(name)
+                                                .orElseThrow(() -> new EntityNotFoundException("name", name));
     }
 }

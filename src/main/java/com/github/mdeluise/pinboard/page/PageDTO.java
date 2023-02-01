@@ -2,6 +2,9 @@ package com.github.mdeluise.pinboard.page;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Schema(name = "Page", description = "Represents a page.")
 public class PageDTO {
     @Schema(description = "ID of the page.", accessMode = Schema.AccessMode.READ_ONLY)
@@ -23,6 +26,16 @@ public class PageDTO {
         accessMode = Schema.AccessMode.READ_ONLY
     )
     private String title;
+    @Schema(
+        description = "Names of the page's tags",
+        example = "[\"tutorial\",\"long\"]"
+    )
+    private Set<String> tagsName = new HashSet<>();
+    @Schema(
+        description = "Names of the lists that contains the page",
+        example = "[\"learning\",\"work\"]"
+    )
+    private Set<String> listsName = new HashSet<>();
 
 
     public Long getId() {
@@ -62,5 +75,25 @@ public class PageDTO {
 
     public void setHeaderImgUrl(String headerImgUrl) {
         this.headerImgUrl = headerImgUrl;
+    }
+
+
+    public Set<String> getTagsName() {
+        return tagsName;
+    }
+
+
+    public void setTagsName(Set<String> tagsName) {
+        this.tagsName = tagsName;
+    }
+
+
+    public Set<String> getListsName() {
+        return listsName;
+    }
+
+
+    public void setListsName(Set<String> listsName) {
+        this.listsName = listsName;
     }
 }

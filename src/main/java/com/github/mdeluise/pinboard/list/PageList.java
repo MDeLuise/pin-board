@@ -1,13 +1,10 @@
 package com.github.mdeluise.pinboard.list;
 
 import com.github.mdeluise.pinboard.page.Page;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -27,16 +24,7 @@ public class PageList {
     @GeneratedValue(generator = "UseExistingIdOtherwiseGenerateUsingIdentity")
     @Column(unique = true, nullable = false)
     private Long id;
-    @ManyToMany(
-        cascade = {
-            CascadeType.PERSIST, CascadeType.MERGE
-        }
-    )
-    @JoinTable(
-        name = "page_page_lists",
-        joinColumns = @JoinColumn(name = "page_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "page_list_id", referencedColumnName = "id")
-    )
+    @ManyToMany(mappedBy = "lists")
     private Set<Page> pages = new HashSet<>();
     @Column(unique = true, nullable = false)
     @NotBlank
