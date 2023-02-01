@@ -1,12 +1,17 @@
 package com.github.mdeluise.pinboard.page;
 
 import com.github.mdeluise.pinboard.common.CrudController;
+import com.github.mdeluise.pinboard.page.body.PageBodyDTO;
+import com.github.mdeluise.pinboard.page.body.PageBodyDTOConverter;
+import com.github.mdeluise.pinboard.page.body.PageBodyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,12 +25,17 @@ import java.util.stream.Collectors;
 public class PageController implements CrudController<PageDTO, Long> {
     private final PageDTOConverter pageDtoConverter;
     private final PageService pageService;
+    private final PageBodyService pageBodyService;
+    private final PageBodyDTOConverter pageBodyDtoConverter;
 
 
     @Autowired
-    public PageController(PageDTOConverter pageDtoConverter, PageService pageService) {
+    public PageController(PageDTOConverter pageDtoConverter, PageService pageService, PageBodyService pageBodyService,
+                          PageBodyDTOConverter pageBodyDtoConverter) {
         this.pageDtoConverter = pageDtoConverter;
         this.pageService = pageService;
+        this.pageBodyService = pageBodyService;
+        this.pageBodyDtoConverter = pageBodyDtoConverter;
     }
 
 
@@ -85,6 +95,18 @@ public class PageController implements CrudController<PageDTO, Long> {
     @Override
     public ResponseEntity<PageDTO> save(PageDTO entityToSave) {
         PageDTO result = pageDtoConverter.convertToDTO(pageService.save(pageDtoConverter.convertFromDTO(entityToSave)));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    @Operation(
+        summary = "Get the Page body",
+        description = "Get the body of the given Page, according to the `id` parameter"
+    )
+    @GetMapping("/{id}/body")
+    public ResponseEntity<PageBodyDTO> getThePageBody(@PathVariable("id") Long pageId) {
+        Page page = pageService.get(pageId);
+        PageBodyDTO result = pageBodyDtoConverter.convertToDTO(pageBodyService.get(page.getId()));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

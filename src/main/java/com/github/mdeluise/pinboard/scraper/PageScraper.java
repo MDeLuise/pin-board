@@ -1,6 +1,7 @@
 package com.github.mdeluise.pinboard.scraper;
 
 import com.github.mdeluise.pinboard.page.Page;
+import com.github.mdeluise.pinboard.page.body.PageBody;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +16,7 @@ public class PageScraper {
         Document doc = Jsoup.connect(toUpdate.getUrl()).get();
         fillTitle(toUpdate, doc);
         fillHeaderImageUrl(toUpdate, doc);
+        fillBody(toUpdate, doc);
         return toUpdate;
     }
 
@@ -34,5 +36,12 @@ public class PageScraper {
         } else {
             toUpdate.setTitle(toUpdate.getUrl());
         }
+    }
+
+
+    private static void fillBody(Page toUpdate, Document doc) {
+        PageBody pageBody = new PageBody(toUpdate);
+        pageBody.setContent(doc.body().toString());
+        toUpdate.setBody(pageBody);
     }
 }

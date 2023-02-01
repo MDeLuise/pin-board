@@ -8,6 +8,7 @@ import com.github.mdeluise.pinboard.authorization.permission.PermissionService;
 import com.github.mdeluise.pinboard.common.AbstractCrudService;
 import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import com.github.mdeluise.pinboard.exception.InvalidPageException;
+import com.github.mdeluise.pinboard.page.body.PageBodyService;
 import com.github.mdeluise.pinboard.scraper.PageScraper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,16 @@ import java.util.Collection;
 public class PageService extends AbstractCrudService<Page, Long> {
     private final UserService userService;
     private final PermissionService permissionService;
+    private final PageBodyService pageBodyService;
 
 
     @Autowired
-    public PageService(PageRepository repository, UserService userService, PermissionService permissionService) {
+    public PageService(PageRepository repository, UserService userService, PermissionService permissionService,
+                       PageBodyService pageBodyService) {
         super(repository);
         this.userService = userService;
         this.permissionService = permissionService;
+        this.pageBodyService = pageBodyService;
     }
 
 
@@ -58,6 +62,7 @@ public class PageService extends AbstractCrudService<Page, Long> {
 
 
     @Override
+    @Transactional
     public Page save(Page entityToSave) {
         Page filledPage;
         try {
@@ -65,6 +70,7 @@ public class PageService extends AbstractCrudService<Page, Long> {
         } catch (IOException e) {
             throw new InvalidPageException(e.getMessage());
         }
+        pageBodyService.save(filledPage.getBody());
         Page saved = repository.save(filledPage);
 
         SecurityContext context = SecurityContextHolder.getContext();

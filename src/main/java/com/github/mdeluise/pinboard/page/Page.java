@@ -1,22 +1,25 @@
 package com.github.mdeluise.pinboard.page;
 
 import com.github.mdeluise.pinboard.list.PageList;
+import com.github.mdeluise.pinboard.page.body.PageBody;
 import com.github.mdeluise.pinboard.tag.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "pages")
-public class Page {
+public class Page implements Serializable {
     @Id
     @GenericGenerator(
         name = "UseExistingIdOtherwiseGenerateUsingIdentity",
@@ -27,6 +30,9 @@ public class Page {
     private Long id;
     private String title;
     private String url;
+    @OneToOne(mappedBy = "page")
+    private PageBody body;
+    private Long pageBodyId;
     private String headerImgUrl;
     @ManyToMany(mappedBy = "pages")
     private Set<Tag> tags = new HashSet<>();
@@ -42,6 +48,7 @@ public class Page {
         this.id = page.getId();
         this.url = page.getUrl();
         this.headerImgUrl = page.getHeaderImgUrl();
+        this.body = page.getBody();
         this.title = page.getTitle();
         this.tags = page.getTags();
         this.lists = page.getLists();
@@ -85,6 +92,26 @@ public class Page {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+
+    public PageBody getBody() {
+        return body;
+    }
+
+
+    public void setBody(PageBody body) {
+        this.body = body;
+    }
+
+
+    public Long getPageBodyId() {
+        return pageBodyId;
+    }
+
+
+    public void setPageBodyId(Long pageBodyId) {
+        this.pageBodyId = pageBodyId;
     }
 
 

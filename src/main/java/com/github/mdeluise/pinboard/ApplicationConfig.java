@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
         contact = @Contact(name = "GitHub page", url = "https://github.com/MDeLuise/pin-board")
     )
 )
+@EnableCaching
 public class ApplicationConfig {
     @Bean
     public ModelMapper modelMapper() {
