@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -101,14 +103,39 @@ public class PageListController implements CrudController<PageListDTO, Long> {
 
     @Operation(
         summary = "Get all pages in the provided Lists",
-        description = "Get all pages in the provided Lists, according to the `ids` parameter."
+        description = "Get all pages in the provided Lists, according to the `listIds` parameter."
     )
-    public ResponseEntity<Collection<PageDTO>> getAllPages(@PathVariable("ids") List<Long> listIds) {
+    @GetMapping("/{listIds}/pages")
+    public ResponseEntity<Collection<PageDTO>> getAllPages(@PathVariable("listIds") List<Long> listIds) {
         Collection<Page> pages = new HashSet<>();
         for (Long listId : listIds) {
             pages.addAll(pageListService.get(listId).getPages());
         }
         Set<PageDTO> result = pages.stream().map(pageDTOConverter::convertToDTO).collect(Collectors.toSet());
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    @Operation(
+        summary = "Add Pages to lists",
+        description = "Add Pages to Lists, according to the `pageIds` and `listIds` parameters."
+    )
+    @PostMapping("/{listId}/add-page/{pageId}")
+    public ResponseEntity<String> addPageToList(
+        @PathVariable("listId") List<Long> listIds, @PathVariable("pageId") List<Long> pageIds) {
+        pageListService.addPagesToLists(listIds, pageIds);
+        return new ResponseEntity<>("Page(s) successfully added to the list(s).", HttpStatus.OK);
+    }
+
+
+    @Operation(
+        summary = "Remove Pages from lists",
+        description = "Remove Pages from Lists, according to the `pageIds` and `listIds` parameters."
+    )
+    @PostMapping("/{listId}/remove-page/{pageId}")
+    public ResponseEntity<String> removePageFromList(
+        @PathVariable("listId") List<Long> listIds, @PathVariable("pageId") List<Long> pageIds) {
+        pageListService.removePagesFromLists(listIds, pageIds);
+        return new ResponseEntity<>("Page(s) successfully removed from the list(s).", HttpStatus.OK);
     }
 }

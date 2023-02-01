@@ -70,4 +70,14 @@ public class Tag {
     public void setPages(Set<Page> pages) {
         this.pages = pages;
     }
+
+
+    public void addPage(Page page) {
+        pages.add(page);
+    }
+
+
+    public void removePage(Page page) {
+        pages.remove(page);
+    }
 }

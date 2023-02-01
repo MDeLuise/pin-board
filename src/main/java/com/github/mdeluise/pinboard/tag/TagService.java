@@ -7,6 +7,8 @@ import com.github.mdeluise.pinboard.authorization.permission.Permission;
 import com.github.mdeluise.pinboard.authorization.permission.PermissionService;
 import com.github.mdeluise.pinboard.common.AbstractCrudService;
 import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
+import com.github.mdeluise.pinboard.page.Page;
+import com.github.mdeluise.pinboard.page.PageService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostFilter;
@@ -17,18 +19,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class TagService extends AbstractCrudService<Tag, Long> {
     private final UserService userService;
     private final PermissionService permissionService;
+    private final PageService pageService;
 
 
     @Autowired
-    public TagService(TagRepository repository, UserService userService, PermissionService permissionService) {
+    public TagService(TagRepository repository, UserService userService, PermissionService permissionService,
+                      PageService pageService) {
         super(repository);
         this.userService = userService;
         this.permissionService = permissionService;
+        this.pageService = pageService;
     }
 
 
@@ -87,5 +93,39 @@ public class TagService extends AbstractCrudService<Tag, Long> {
         toUpdate.setName(updatedEntity.getName());
         toUpdate.setPages(updatedEntity.getPages());
         return repository.save(toUpdate);
+    }
+
+
+    @Transactional
+    public void addTagsToPage(List<Long> tagIds, Long pageId) {
+        Page page = pageService.get(pageId);
+        for (Long tagId: tagIds) {
+            addTagToPage(page, tagId);
+        }
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN') or (hasAuthority('write:tag:' + #tagId) and hasAuthority('write:page:' + #page.id))")
+    private void addTagToPage(Page page, Long tagId) {
+        Tag tag = get(tagId);
+        tag.addPage(page);
+        repository.save(tag);
+    }
+
+
+    @Transactional
+    public void removeTagsToPage(List<Long> tagIds, Long pageId) {
+        Page page = pageService.get(pageId);
+        for (Long tagId: tagIds) {
+            removeTagFromPage(page, tagId);
+        }
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN') or (hasAuthority('write:tag:' + #tagId) and hasAuthority('write:page:' + #page.id))")
+    private void removeTagFromPage(Page page, Long tagId) {
+        Tag tag = get(tagId);
+        tag.removePage(page);
+        repository.save(tag);
     }
 }

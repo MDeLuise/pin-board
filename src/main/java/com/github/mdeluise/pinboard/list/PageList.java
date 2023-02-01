@@ -64,6 +64,16 @@ public class PageList {
     }
 
 
+    public void addPage(Page page) {
+        pages.add(page);
+    }
+
+
+    public void removePage(Page page) {
+        pages.remove(page);
+    }
+
+
     public String getName() {
         return name;
     }

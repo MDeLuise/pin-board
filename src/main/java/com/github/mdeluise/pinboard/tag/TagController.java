@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -95,14 +97,39 @@ public class TagController implements CrudController<TagDTO, Long> {
 
     @Operation(
         summary = "Get all pages with the provided Tags",
-        description = "Get all pages with the provided Tags, according to the `ids` parameter."
+        description = "Get all pages with the provided Tags, according to the `tagIds` parameter."
     )
-    public ResponseEntity<Collection<PageDTO>> getAllPages(@PathVariable("ids") List<Long> tagIds) {
+    @GetMapping("/{tagIds}/pages")
+    public ResponseEntity<Collection<PageDTO>> getAllPages(@PathVariable("tagIds") List<Long> tagIds) {
         Collection<Page> pages = new HashSet<>();
         for (Long tagId : tagIds) {
             pages.addAll(tagService.get(tagId).getPages());
         }
         Set<PageDTO> result = pages.stream().map(pageDTOConverter::convertToDTO).collect(Collectors.toSet());
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    @Operation(
+        summary = "Add a Tags to a Page",
+        description = "Add a Tags to a Page, according to the `tagIds` and `pageId` parameters."
+    )
+    @PostMapping("/{tagIds}/add-to-page/{pageId}")
+    public ResponseEntity<String> addTagsToPage(
+        @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageId") Long pageId) {
+        tagService.addTagsToPage(tagId, pageId);
+        return new ResponseEntity<>("Tag(s) successfully added to page.", HttpStatus.OK);
+    }
+
+
+    @Operation(
+        summary = "Remove Tags from a Page",
+        description = "Remove Tags from a Page, according to the `tagIds` and `pageId` parameters."
+    )
+    @PostMapping("/{tagIds}/remove-from-page/{pageId}")
+    public ResponseEntity<String> removeTagsFromPage(
+        @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageId") Long pageId) {
+        tagService.removeTagsToPage(tagId, pageId);
+        return new ResponseEntity<>("Tag(s) successfully removed from page.", HttpStatus.OK);
     }
 }
