@@ -5,8 +5,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-    <changeSet id="createUser" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
+    <changeSet id="insertUser" author="MDeLuise">
+        <preConditions onFail="HALT">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
                 FROM application_users
@@ -20,8 +20,8 @@
         </insert>
     </changeSet>
 
-    <changeSet id="createUser1" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
+    <changeSet id="insertUser1" author="MDeLuise">
+        <preConditions onFail="HALT">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
                 FROM application_users
@@ -35,8 +35,8 @@
         </insert>
     </changeSet>
 
-    <changeSet id="createUser2" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
+    <changeSet id="insertUser2" author="MDeLuise">
+        <preConditions onFail="HALT">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
                 FROM application_users

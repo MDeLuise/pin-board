@@ -5,244 +5,84 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-    <changeSet id="createWalletTable" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="wallets"/>
-            </not>
-        </preConditions>
-        <createTable tableName="wallets">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="varchar(255)">
-            </column>
-            <column name="starting_amount" type="float">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
 
-    <changeSet id="createWallets" author="MDeLuise">
-        <insert tableName="wallets">
+    <changeSet id="insertPages" author="MDeLuise">
+        <insert tableName="pages">
             <column name="id" value="1"/>
-            <column name="name" value="Bank 1"/>
-            <column name="description" value="Unicredit bank"/>
-            <column name="starting_amount" value="1000"/>
+            <column name="title" value="The Hitchhiker's Guide to the Galaxy - Wikipedia"/>
+            <column name="url" value="https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy"/>
+            <column name="header_img_url"
+                    value="https://upload.wikimedia.org/wikipedia/en/b/bd/H2G2_UK_front_cover.jpg"/>
+            <column name="page_body_id" value="1"/>
         </insert>
-        <insert tableName="wallets">
+        <insert tableName="pages">
             <column name="id" value="2"/>
-            <column name="name" value="Bank 2"/>
-            <column name="description" value="Hype bank"/>
-            <column name="starting_amount" value="1000"/>
-        </insert>
-        <insert tableName="wallets">
-            <column name="id" value="3"/>
-            <column name="name" value="Bank 3"/>
-            <column name="description" value="Revolut bank"/>
-            <column name="starting_amount" value="1000"/>
-        </insert>
-        <insert tableName="wallets">
-            <column name="id" value="4"/>
-            <column name="name" value="Prepaid card 1"/>
-            <column name="description" value="Postepay"/>
-            <column name="starting_amount" value="1000"/>
+            <column name="title" value="The Hitchhiker's Guide to the Galaxy (disambiguation) - Wikipedia"/>
+            <column name="url"
+                    value="https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy_(disambiguation)"/>
+            <column name="header_img_url" value="https://en.wikipedia.org/static/images/icons/wikipedia.png"/>
+            <column name="page_body_id" value="2"/>
         </insert>
     </changeSet>
 
 
-    <changeSet id="createCategoryTable" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="categories"/>
-            </not>
-        </preConditions>
-        <createTable tableName="categories">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="varchar(255)">
-            </column>
-        </createTable>
+    <changeSet id="insertPagesBody" author="MDeLuise">
+        <insert tableName="pages_body">
+            <column name="content" value="&lt;html\&gt;...42...&lt;/html&gt;"/>
+            <column name="page_id" value="2"/>
+        </insert>
+        <insert tableName="pages_body">
+            <column name="content" value="&lt;html&gt;...42...&lt;/html&gt;"/>
+            <column name="page_id" value="1"/>
+        </insert>
     </changeSet>
 
 
-    <changeSet id="createCategories" author="MDeLuise">
-        <insert tableName="categories">
+    <changeSet id="insertTags" author="MDeLuise">
+        <insert tableName="tags">
             <column name="id" value="1"/>
-            <column name="name" value="Grocery"/>
+            <column name="name" value="tutorial"/>
         </insert>
-        <insert tableName="categories">
+        <insert tableName="tags">
             <column name="id" value="2"/>
-            <column name="name" value="Food"/>
-        </insert>
-        <insert tableName="categories">
-            <column name="id" value="3"/>
-            <column name="name" value="Medical"/>
+            <column name="name" value="long"/>
         </insert>
     </changeSet>
 
 
-    <changeSet id="createSubCategoryTable" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="sub_categories"/>
-            </not>
-        </preConditions>
-        <createTable tableName="sub_categories">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="varchar(255)">
-            </column>
-            <column name="category_id" type="bigint">
-            </column>
-        </createTable>
-        <addForeignKeyConstraint baseColumnNames="category_id"
-                                 baseTableName="sub_categories"
-                                 constraintName="fk_sub_category_category_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="categories"/>
-    </changeSet>
-
-
-    <changeSet id="createOutcomeTable" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="outcomes"/>
-            </not>
-        </preConditions>
-        <createTable tableName="outcomes">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="amount" type="float">
-                <constraints nullable="false"/>
-            </column>
-            <column name="quantity" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="varchar(255)">
-            </column>
-            <column name="note" type="varchar(255)">
-            </column>
-            <column name="date" type="date">
-            </column>
-            <column name="wallet_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="counterpart_id" type="bigint">
-            </column>
-            <column name="category_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="sub_category_id" type="bigint">
-            </column>
-            <column name="discount" type="boolean">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-
-        <addForeignKeyConstraint baseColumnNames="wallet_id"
-                                 baseTableName="outcomes"
-                                 constraintName="fk_outcome_wallet_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="wallets"/>
-        <!--        <addForeignKeyConstraint baseColumnNames="counterpart_id"
-                                         baseTableName="outcomes"
-                                         constraintName="fk_wallet_id"
-                                         referencedColumnNames="id"
-                                         referencedTableName="wallets"/> -->
-        <addForeignKeyConstraint baseColumnNames="category_id"
-                                 baseTableName="outcomes"
-                                 constraintName="fk_outcome_category_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="categories"/>
-        <addForeignKeyConstraint baseColumnNames="sub_category_id"
-                                 baseTableName="outcomes"
-                                 constraintName="fk_sub_outcome_category_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="sub_categories"/>
-
-    </changeSet>
-
-
-    <changeSet id="createIncomeTable" author="MDeLuise">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="incomes"/>
-            </not>
-        </preConditions>
-        <createTable tableName="incomes">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="amount" type="float">
-                <constraints nullable="false"/>
-            </column>
-            <column name="quantity" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="varchar(255)">
-            </column>
-            <column name="note" type="varchar(255)">
-            </column>
-            <column name="date" type="date">
-            </column>
-            <column name="wallet_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="counterpart_id" type="bigint">
-            </column>
-        </createTable>
-
-
-        <addForeignKeyConstraint baseColumnNames="wallet_id"
-                                 baseTableName="outcomes"
-                                 constraintName="fk_income_wallet_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="wallets"/>
-    </changeSet>
-
-    <changeSet id="createIncomes" author="MDeLuise">
-        <insert tableName="incomes">
-            <column name="id" value="4"/>
-            <column name="amount" value="20"/>
-            <column name="quantity" value="1"/>
-            <column name="description" value="boh..."/>
-            <column name="note" value=""/>
-            <column name="date" value="1674740612"/>
-            <column name="wallet_id" value="1"/>
+    <changeSet id="insertTagToPage" author="MDeLuise">
+        <insert tableName="page_tags">
+            <column name="page_id" value="1"/>
+            <column name="tag_id" value="1"/>
         </insert>
-        <insert tableName="incomes">
-            <column name="id" value="5"/>
-            <column name="amount" value="2.5"/>
-            <column name="quantity" value="1"/>
-            <column name="description" value="boh..."/>
-            <column name="note" value=""/>
-            <column name="date" value="1674750612"/>
-            <column name="wallet_id" value="1"/>
-        </insert>
-        <insert tableName="incomes">
-            <column name="id" value="100"/>
-            <column name="amount" value="5.3"/>
-            <column name="quantity" value="1"/>
-            <column name="description" value="boh..."/>
-            <column name="note" value=""/>
-            <column name="date" value="1674760612"/>
-            <column name="wallet_id" value="1"/>
+        <insert tableName="page_tags">
+            <column name="page_id" value="2"/>
+            <column name="tag_id" value="2"/>
         </insert>
     </changeSet>
 
+
+    <changeSet id="insertPageLists" author="MDeLuise">
+        <insert tableName="page_lists">
+            <column name="id" value="1"/>
+            <column name="name" value="learning"/>
+        </insert>
+        <insert tableName="page_lists">
+            <column name="id" value="2"/>
+            <column name="name" value="work"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet id="insertListToPage" author="MDeLuise">
+        <insert tableName="page_page_lists">
+            <column name="page_id" value="1"/>
+            <column name="page_list_id" value="1"/>
+        </insert>
+        <insert tableName="page_page_lists">
+            <column name="page_id" value="2"/>
+            <column name="page_list_id" value="2"/>
+        </insert>
+    </changeSet>
 
 </databaseChangeLog>

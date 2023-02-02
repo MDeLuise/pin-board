@@ -1,29 +1,27 @@
 package com.github.mdeluise.pinboard.page.body;
 
 import com.github.mdeluise.pinboard.page.Page;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "pages_body")
 public class PageBody implements Serializable {
     @Id
-    @GeneratedValue
     private Long id;
     @Lob
     @NotBlank
     private String content;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "page_id", referencedColumnName = "id")
+    @OneToOne
+    @MapsId
     private Page page;
 
 
@@ -64,5 +62,24 @@ public class PageBody implements Serializable {
 
     public void setPage(Page page) {
         this.page = page;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PageBody pageBody = (PageBody) o;
+        return id.equals(pageBody.id) && content.equals(pageBody.content);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, content);
     }
 }

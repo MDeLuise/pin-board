@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -18,10 +19,11 @@ import java.util.Set;
 public class PageList {
     @Id
     @GenericGenerator(
-        name = "UseExistingIdOtherwiseGenerateUsingIdentity",
-        strategy = "com.github.mdeluise.pinboard.common.UseExistingIdOtherwiseGenerateUsingIdentity"
+        name = "IntegrationTestIdentityGenerator",
+        strategy = "com.github.mdeluise.pinboard.common.IntegrationTestIdentityGenerator",
+        parameters = @org.hibernate.annotations.Parameter(name = "tableName", value = "page_lists")
     )
-    @GeneratedValue(generator = "UseExistingIdOtherwiseGenerateUsingIdentity")
+    @GeneratedValue(generator = "IntegrationTestIdentityGenerator")
     @Column(unique = true, nullable = false)
     private Long id;
     @ManyToMany(mappedBy = "lists")
@@ -79,5 +81,24 @@ public class PageList {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PageList pageList = (PageList) o;
+        return id.equals(pageList.id) && name.equals(pageList.name);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

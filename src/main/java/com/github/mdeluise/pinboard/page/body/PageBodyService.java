@@ -34,7 +34,8 @@ public class PageBodyService extends AbstractCrudService<PageBody, Long> {
     @Override
     @CacheEvict(value = "bodies", key = "#id")
     public void remove(Long id) {
-        repository.deleteById(id);
+        PageBody toRemove = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        repository.delete(toRemove);
     }
 
 

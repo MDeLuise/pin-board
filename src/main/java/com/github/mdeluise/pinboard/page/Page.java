@@ -25,16 +25,18 @@ import java.util.Set;
 public class Page implements Serializable {
     @Id
     @GenericGenerator(
-        name = "UseExistingIdOtherwiseGenerateUsingIdentity",
-        strategy = "com.github.mdeluise.pinboard.common.UseExistingIdOtherwiseGenerateUsingIdentity"
+        name = "IntegrationTestIdentityGenerator",
+        strategy = "com.github.mdeluise.pinboard.common.IntegrationTestIdentityGenerator",
+        parameters = @org.hibernate.annotations.Parameter(name = "tableName", value = "pages")
     )
-    @GeneratedValue(generator = "UseExistingIdOtherwiseGenerateUsingIdentity")
+    @GeneratedValue(generator = "IntegrationTestIdentityGenerator")
     @Column(unique = true, nullable = false)
     private Long id;
     private String title;
     private String url;
-    @OneToOne(mappedBy = "page")
+    @OneToOne(mappedBy = "page", cascade = CascadeType.ALL)
     private PageBody body;
+    @Column(unique = true)
     private Long pageBodyId;
     private String headerImgUrl;
     @ManyToMany(
@@ -165,12 +167,12 @@ public class Page implements Serializable {
             return false;
         }
         Page page = (Page) o;
-        return url.equals(page.url);
+        return id.equals(page.id) && url.equals(page.url);
     }
 
 
     @Override
     public int hashCode() {
-        return Objects.hash(url);
+        return Objects.hash(id, url);
     }
 }

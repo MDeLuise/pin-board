@@ -3,6 +3,7 @@ package com.github.mdeluise.pinboard.page;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Schema(name = "Page", description = "Represents a page.")
@@ -95,5 +96,24 @@ public class PageDTO {
 
     public void setListsName(Set<String> listsName) {
         this.listsName = listsName;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PageDTO pageDTO = (PageDTO) o;
+        return id.equals(pageDTO.id) && url.equals(pageDTO.url);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, url);
     }
 }

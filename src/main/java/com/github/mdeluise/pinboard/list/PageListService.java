@@ -90,6 +90,7 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('write:list:' + #id)")
     public PageList update(Long id, PageList updatedEntity) {
+        // FIXME if change name then also permission (even for other entities)
         PageList toUpdate = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
         toUpdate.setPages(updatedEntity.getPages());
         return repository.save(toUpdate);

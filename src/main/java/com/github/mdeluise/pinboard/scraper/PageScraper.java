@@ -6,12 +6,14 @@ import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class PageScraper {
 
-    public static Page fillMissingFields(final Page page) throws IOException {
+    public Page fillMissingFields(final Page page) throws IOException {
         Page toUpdate = new Page(page);
         Document doc = Jsoup.connect(toUpdate.getUrl()).get();
         fillTitle(toUpdate, doc);
@@ -21,7 +23,7 @@ public class PageScraper {
     }
 
 
-    private static void fillHeaderImageUrl(Page toUpdate, Document doc) {
+    private void fillHeaderImageUrl(Page toUpdate, Document doc) {
         Element firstImg = doc.select("body img").first();
         if (firstImg != null) {
             toUpdate.setHeaderImgUrl(firstImg.attr("src"));
@@ -29,7 +31,7 @@ public class PageScraper {
     }
 
 
-    private static void fillTitle(Page toUpdate, Document doc) {
+    private void fillTitle(Page toUpdate, Document doc) {
         String title = doc.title();
         if (Strings.isNotBlank(title)) {
             toUpdate.setTitle(doc.title());
@@ -39,7 +41,7 @@ public class PageScraper {
     }
 
 
-    private static void fillBody(Page toUpdate, Document doc) {
+    private void fillBody(Page toUpdate, Document doc) {
         PageBody pageBody = new PageBody(toUpdate);
         pageBody.setContent(doc.body().toString());
         toUpdate.setBody(pageBody);

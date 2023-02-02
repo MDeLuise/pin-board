@@ -27,15 +27,17 @@ public class PageService extends AbstractCrudService<Page, Long> {
     private final UserService userService;
     private final PermissionService permissionService;
     private final PageBodyService pageBodyService;
+    private final PageScraper pageScraper;
 
 
     @Autowired
     public PageService(PageRepository repository, UserService userService, PermissionService permissionService,
-                       PageBodyService pageBodyService) {
+                       PageBodyService pageBodyService, PageScraper pageScraper) {
         super(repository);
         this.userService = userService;
         this.permissionService = permissionService;
         this.pageBodyService = pageBodyService;
+        this.pageScraper = pageScraper;
     }
 
 
@@ -66,11 +68,10 @@ public class PageService extends AbstractCrudService<Page, Long> {
     public Page save(Page entityToSave) {
         Page filledPage;
         try {
-            filledPage = PageScraper.fillMissingFields(entityToSave);
+            filledPage = pageScraper.fillMissingFields(entityToSave);
         } catch (IOException e) {
             throw new InvalidPageException(e.getMessage());
         }
-        pageBodyService.save(filledPage.getBody());
         Page saved = repository.save(filledPage);
 
         SecurityContext context = SecurityContextHolder.getContext();
@@ -105,7 +106,7 @@ public class PageService extends AbstractCrudService<Page, Long> {
         if (!toUpdate.getUrl().equals(updatedEntity.getUrl())) {
             toUpdate.setUrl(updatedEntity.getUrl());
             try {
-                toUpdate = PageScraper.fillMissingFields(toUpdate);
+                toUpdate = pageScraper.fillMissingFields(toUpdate);
             } catch (IOException e) {
                 throw new InvalidPageException(e.getMessage());
             }

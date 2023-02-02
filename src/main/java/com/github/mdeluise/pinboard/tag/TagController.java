@@ -26,14 +26,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/tag")
 @Tag(name = "Tag", description = "Endpoints for operations on tags.")
 public class TagController implements CrudController<TagDTO, Long> {
-    private final TagDTOConverter pageDtoConverter;
+    private final TagDTOConverter tagDTOConverter;
     private final TagService tagService;
     private final PageDTOConverter pageDTOConverter;
 
 
     @Autowired
-    public TagController(TagDTOConverter pageDtoConverter, TagService tagService, PageDTOConverter pageDTOConverter) {
-        this.pageDtoConverter = pageDtoConverter;
+    public TagController(TagDTOConverter tagDTOConverter, TagService tagService, PageDTOConverter pageDTOConverter) {
+        this.tagDTOConverter = tagDTOConverter;
         this.tagService = tagService;
         this.pageDTOConverter = pageDTOConverter;
     }
@@ -45,7 +45,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     @Override
     public ResponseEntity<Collection<TagDTO>> findAll() {
         Set<TagDTO> result =
-            tagService.getAll().stream().map(pageDtoConverter::convertToDTO).collect(Collectors.toSet());
+            tagService.getAll().stream().map(tagDTOConverter::convertToDTO).collect(Collectors.toSet());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -56,7 +56,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     @Override
     public ResponseEntity<TagDTO> find(
         @Parameter(description = "The ID of the Tag on which to perform the operation") Long id) {
-        TagDTO result = pageDtoConverter.convertToDTO(tagService.get(id));
+        TagDTO result = tagDTOConverter.convertToDTO(tagService.get(id));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -70,8 +70,8 @@ public class TagController implements CrudController<TagDTO, Long> {
     public ResponseEntity<TagDTO> update(TagDTO updatedEntity, @Parameter(
         description = "The ID of the Tag on which to perform the operation"
     ) Long id) {
-        TagDTO result = pageDtoConverter.convertToDTO(
-            tagService.update(id, pageDtoConverter.convertFromDTO(updatedEntity)));
+        TagDTO result = tagDTOConverter.convertToDTO(
+            tagService.update(id, tagDTOConverter.convertFromDTO(updatedEntity)));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -90,7 +90,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     )
     @Override
     public ResponseEntity<TagDTO> save(TagDTO entityToSave) {
-        TagDTO result = pageDtoConverter.convertToDTO(tagService.save(pageDtoConverter.convertFromDTO(entityToSave)));
+        TagDTO result = tagDTOConverter.convertToDTO(tagService.save(tagDTOConverter.convertFromDTO(entityToSave)));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

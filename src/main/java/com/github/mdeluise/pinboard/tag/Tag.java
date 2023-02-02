@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -18,10 +19,11 @@ import java.util.Set;
 public class Tag {
     @Id
     @GenericGenerator(
-        name = "UseExistingIdOtherwiseGenerateUsingIdentity",
-        strategy = "com.github.mdeluise.pinboard.common.UseExistingIdOtherwiseGenerateUsingIdentity"
+        name = "IntegrationTestIdentityGenerator",
+        strategy = "com.github.mdeluise.pinboard.common.IntegrationTestIdentityGenerator",
+        parameters = @org.hibernate.annotations.Parameter(name = "tableName", value = "tags")
     )
-    @GeneratedValue(generator = "UseExistingIdOtherwiseGenerateUsingIdentity")
+    @GeneratedValue(generator = "IntegrationTestIdentityGenerator")
     @Column(unique = true, nullable = false)
     private Long id;
     @Column(unique = true, nullable = false)
@@ -67,5 +69,24 @@ public class Tag {
 
     public void removePage(Page page) {
         pages.remove(page);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Tag tag = (Tag) o;
+        return id.equals(tag.id) && name.equals(tag.name);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

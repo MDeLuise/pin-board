@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="createUserTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="application_users"/>
+            </not>
+        </preConditions>
+        <createTable tableName="application_users">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createRoleTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="application_roles"/>
+            </not>
+        </preConditions>
+        <createTable tableName="application_roles">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createRoleToUserTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_roles"/>
+            </not>
+        </preConditions>
+        <createTable tableName="user_roles">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_role_user" references="application_users(id)"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_user_role" references="application_roles(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="createPageTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="pages"/>
+            </not>
+        </preConditions>
+        <createTable tableName="pages">
+            <column name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="header_img_url" type="varchar(255)">
+            </column>
+            <column name="page_body_id" type="bigint">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="createPagesBodyTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="pages_body"/>
+            </not>
+        </preConditions>
+        <createTable tableName="pages_body">
+            <column name="content" type="blob">
+                <constraints nullable="false"/>
+            </column>
+            <column name="page_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_pageBody_page" references="pages(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="createTagTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tags"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tags">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="createTagToPageTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="page_tags"/>
+            </not>
+        </preConditions>
+        <createTable tableName="page_tags">
+            <column name="page_id" type="bigint">
+                <constraints foreignKeyName="fk_pageTag_page" references="pages(id)"/>
+            </column>
+            <column name="tag_id" type="bigint">
+                <constraints foreignKeyName="fk_pageTag_tag" references="tags(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="createPageListTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="page_lists"/>
+            </not>
+        </preConditions>
+        <createTable tableName="page_lists">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="varchar(255)">
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="createListToPageTable" author="MDeLuise">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="page_page_lists"/>
+            </not>
+        </preConditions>
+        <createTable tableName="page_page_lists">
+            <column name="page_id" type="bigint">
+                <constraints foreignKeyName="fk_pageList_page" references="pages(id)"/>
+            </column>
+            <column name="page_list_id" type="bigint">
+                <constraints foreignKeyName="fk_pageList_list" references="page_lists(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
