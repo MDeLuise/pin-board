@@ -111,25 +111,25 @@ public class TagController implements CrudController<TagDTO, Long> {
 
 
     @Operation(
-        summary = "Add a Tags to a Page",
-        description = "Add a Tags to a Page, according to the `tagIds` and `pageId` parameters."
+        summary = "Add Tags to Pages",
+        description = "Add Tags to Pages, according to the `tagIds` and `pageIds` parameters."
     )
-    @PostMapping("/{tagIds}/add-to-page/{pageId}")
-    public ResponseEntity<String> addTagsToPage(
-        @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageId") Long pageId) {
-        tagService.addTagsToPage(tagId, pageId);
-        return new ResponseEntity<>("Tag(s) successfully added to page.", HttpStatus.OK);
+    @PostMapping("/{tagIds}/add-to-page/{pageIds}")
+    public ResponseEntity<String> addTagsToPages(
+        @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageIds") List<Long> pageIds) {
+        tagService.addTagsToPages(tagId, pageIds);
+        return new ResponseEntity<>("Tag(s) successfully added to page(s).", HttpStatus.OK);
     }
 
 
     @Operation(
-        summary = "Remove Tags from a Page",
-        description = "Remove Tags from a Page, according to the `tagIds` and `pageId` parameters."
+        summary = "Remove Tags from Pages",
+        description = "Remove Tags from Pages, according to the `tagIds` and `pageIds` parameters."
     )
-    @PostMapping("/{tagIds}/remove-from-page/{pageId}")
-    public ResponseEntity<String> removeTagsFromPage(
-        @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageId") Long pageId) {
-        tagService.removeTagsToPage(tagId, pageId);
-        return new ResponseEntity<>("Tag(s) successfully removed from page.", HttpStatus.OK);
+    @PostMapping("/{tagIds}/remove-from-page/{pageIds}")
+    public ResponseEntity<String> removeTagsFromPages(
+        @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageIds") List<Long> pageIds) {
+        tagService.removeTagsFromPages(tagId, pageIds);
+        return new ResponseEntity<>("Tag(s) successfully removed from page(s).", HttpStatus.OK);
     }
 }

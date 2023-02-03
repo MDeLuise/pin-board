@@ -21,7 +21,7 @@ public class PageBodyService extends AbstractCrudService<PageBody, Long> {
 
     @Override
     public Collection<PageBody> getAll() {
-        throw new UnsupportedOperationException();
+        return ((PageBodyRepository) repository).findAll();
     }
 
 

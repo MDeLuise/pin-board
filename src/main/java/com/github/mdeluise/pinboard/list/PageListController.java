@@ -120,9 +120,9 @@ public class PageListController implements CrudController<PageListDTO, Long> {
         summary = "Add Pages to lists",
         description = "Add Pages to Lists, according to the `pageIds` and `listIds` parameters."
     )
-    @PostMapping("/{listId}/add-page/{pageId}")
-    public ResponseEntity<String> addPageToList(
-        @PathVariable("listId") List<Long> listIds, @PathVariable("pageId") List<Long> pageIds) {
+    @PostMapping("/{listIds}/add-page/{pageIds}")
+    public ResponseEntity<String> addPagesToLists(
+        @PathVariable("listIds") List<Long> listIds, @PathVariable("pageIds") List<Long> pageIds) {
         pageListService.addPagesToLists(listIds, pageIds);
         return new ResponseEntity<>("Page(s) successfully added to the list(s).", HttpStatus.OK);
     }
@@ -132,9 +132,9 @@ public class PageListController implements CrudController<PageListDTO, Long> {
         summary = "Remove Pages from lists",
         description = "Remove Pages from Lists, according to the `pageIds` and `listIds` parameters."
     )
-    @PostMapping("/{listId}/remove-page/{pageId}")
-    public ResponseEntity<String> removePageFromList(
-        @PathVariable("listId") List<Long> listIds, @PathVariable("pageId") List<Long> pageIds) {
+    @PostMapping("/{listIds}/remove-page/{pageIds}")
+    public ResponseEntity<String> removePagesFromLists(
+        @PathVariable("listIds") List<Long> listIds, @PathVariable("pageIds") List<Long> pageIds) {
         pageListService.removePagesFromLists(listIds, pageIds);
         return new ResponseEntity<>("Page(s) successfully removed from the list(s).", HttpStatus.OK);
     }

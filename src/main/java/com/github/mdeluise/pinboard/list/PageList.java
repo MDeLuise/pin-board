@@ -1,11 +1,13 @@
 package com.github.mdeluise.pinboard.list;
 
 import com.github.mdeluise.pinboard.page.Page;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.GenericGenerator;
@@ -26,7 +28,7 @@ public class PageList {
     @GeneratedValue(generator = "IntegrationTestIdentityGenerator")
     @Column(unique = true, nullable = false)
     private Long id;
-    @ManyToMany(mappedBy = "lists")
+    @ManyToMany(mappedBy = "lists", cascade = CascadeType.PERSIST)
     private Set<Page> pages = new HashSet<>();
     @Column(unique = true, nullable = false)
     @NotBlank
@@ -81,6 +83,14 @@ public class PageList {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    @PreRemove
+    public void beforeRemove() {
+        pages.forEach(page -> {
+            page.removeList(this);
+        });
     }
 
 

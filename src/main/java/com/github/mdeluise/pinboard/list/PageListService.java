@@ -93,6 +93,7 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
         // FIXME if change name then also permission (even for other entities)
         PageList toUpdate = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
         toUpdate.setPages(updatedEntity.getPages());
+        toUpdate.setName(updatedEntity.getName());
         return repository.save(toUpdate);
     }
 
@@ -112,8 +113,8 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
     private void addPageToList(Long pageListId, Long pageId) {
         PageList pageList = get(pageListId);
         Page page = pageService.get(pageId);
-        pageList.addPage(page);
-        update(pageListId, pageList);
+        page.addList(pageList);
+        pageService.update(page.getId(), page);
     }
 
 
@@ -132,8 +133,8 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
     private void removePageFromList(Long pageListId, Long pageId) {
         PageList pageList = get(pageListId);
         Page page = pageService.get(pageId);
-        pageList.removePage(page);
-        update(pageListId, pageList);
+        page.removeList(pageList);
+        pageService.update(page.getId(), page);
     }
 
 

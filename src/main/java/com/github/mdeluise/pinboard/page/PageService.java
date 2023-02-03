@@ -8,7 +8,6 @@ import com.github.mdeluise.pinboard.authorization.permission.PermissionService;
 import com.github.mdeluise.pinboard.common.AbstractCrudService;
 import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import com.github.mdeluise.pinboard.exception.InvalidPageException;
-import com.github.mdeluise.pinboard.page.body.PageBodyService;
 import com.github.mdeluise.pinboard.scraper.PageScraper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +25,15 @@ import java.util.Collection;
 public class PageService extends AbstractCrudService<Page, Long> {
     private final UserService userService;
     private final PermissionService permissionService;
-    private final PageBodyService pageBodyService;
     private final PageScraper pageScraper;
 
 
     @Autowired
     public PageService(PageRepository repository, UserService userService, PermissionService permissionService,
-                       PageBodyService pageBodyService, PageScraper pageScraper) {
+                       PageScraper pageScraper) {
         super(repository);
         this.userService = userService;
         this.permissionService = permissionService;
-        this.pageBodyService = pageBodyService;
         this.pageScraper = pageScraper;
     }
 

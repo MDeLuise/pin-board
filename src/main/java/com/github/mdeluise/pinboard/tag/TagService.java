@@ -98,36 +98,40 @@ public class TagService extends AbstractCrudService<Tag, Long> {
 
 
     @Transactional
-    public void addTagsToPage(List<Long> tagIds, Long pageId) {
-        Page page = pageService.get(pageId);
-        for (Long tagId: tagIds) {
-            addTagToPage(page, tagId);
+    public void addTagsToPages(List<Long> tagIds, List<Long> pageIds) {
+        for (Long tagId : tagIds) {
+            for (Long pageId : pageIds) {
+                addTagToPage(tagId, pageId);
+            }
         }
     }
 
 
     @PreAuthorize("hasRole('ADMIN') or (hasAuthority('write:tag:' + #tagId) and hasAuthority('write:page:' + #page.id))")
-    private void addTagToPage(Page page, Long tagId) {
+    private void addTagToPage(Long tagId, Long pageId) {
         Tag tag = get(tagId);
-        tag.addPage(page);
-        repository.save(tag);
+        Page page = pageService.get(pageId);
+        page.addTag(tag);
+        pageService.update(page.getId(), page);
     }
 
 
     @Transactional
-    public void removeTagsToPage(List<Long> tagIds, Long pageId) {
-        Page page = pageService.get(pageId);
-        for (Long tagId: tagIds) {
-            removeTagFromPage(page, tagId);
+    public void removeTagsFromPages(List<Long> tagIds, List<Long> pageIds) {
+        for (Long tagId : tagIds) {
+            for (Long pageId : pageIds) {
+                removeTagFromPage(tagId, pageId);
+            }
         }
     }
 
 
     @PreAuthorize("hasRole('ADMIN') or (hasAuthority('write:tag:' + #tagId) and hasAuthority('write:page:' + #page.id))")
-    private void removeTagFromPage(Page page, Long tagId) {
+    private void removeTagFromPage(Long tagId, Long pageId) {
         Tag tag = get(tagId);
-        tag.removePage(page);
-        repository.save(tag);
+        Page page = pageService.get(pageId);
+        page.removeTag(tag);
+        pageService.update(page.getId(), page);
     }
 
 

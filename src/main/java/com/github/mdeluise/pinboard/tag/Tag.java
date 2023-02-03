@@ -1,11 +1,13 @@
 package com.github.mdeluise.pinboard.tag;
 
 import com.github.mdeluise.pinboard.page.Page;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.GenericGenerator;
@@ -29,7 +31,7 @@ public class Tag {
     @Column(unique = true, nullable = false)
     @NotBlank
     private String name;
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.PERSIST)
     private Set<Page> pages = new HashSet<>();
 
 
@@ -69,6 +71,14 @@ public class Tag {
 
     public void removePage(Page page) {
         pages.remove(page);
+    }
+
+
+    @PreRemove
+    public void beforeRemove() {
+        pages.forEach(page -> {
+            page.removeTag(this);
+        });
     }
 
 

@@ -58,7 +58,7 @@ public class PageBodyServiceTest {
 
 
     @Test
-    void whenGetAllPageBodies_thenReturnError() {
+    void whenGetAllPageBodies_thenReturnAllBodies() {
         PageBody toGet1 = new PageBody();
         toGet1.setId(0L);
         toGet1.setContent("pageBody0");
@@ -69,7 +69,7 @@ public class PageBodyServiceTest {
         List<PageBody> allPageBodies = List.of(toGet1, toGet2);
         Mockito.when(pageBodyRepository.findAll()).thenReturn(allPageBodies);
 
-        Assertions.assertThatThrownBy(() -> pageBodyService.getAll()).isInstanceOf(UnsupportedOperationException.class);
+        Assertions.assertThat(pageBodyService.getAll()).isSameAs(allPageBodies);
     }
 
 

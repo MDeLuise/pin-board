@@ -39,22 +39,14 @@ public class Page implements Serializable {
     @Column(unique = true)
     private Long pageBodyId;
     private String headerImgUrl;
-    @ManyToMany(
-        cascade = {
-            CascadeType.PERSIST, CascadeType.MERGE
-        }
-    )
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
         name = "page_tags",
         joinColumns = @JoinColumn(name = "page_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
     )
     private Set<Tag> tags = new HashSet<>();
-    @ManyToMany(
-        cascade = {
-            CascadeType.PERSIST, CascadeType.MERGE
-        }
-    )
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
         name = "page_page_lists",
         joinColumns = @JoinColumn(name = "page_id", referencedColumnName = "id"),
@@ -155,6 +147,26 @@ public class Page implements Serializable {
 
     public void setLists(Set<PageList> lists) {
         this.lists = lists;
+    }
+
+
+    public void addList(PageList pageList) {
+        lists.add(pageList);
+    }
+
+
+    public void removeList(PageList pageList) {
+        lists.remove(pageList);
+    }
+
+
+    public void addTag(Tag tag) {
+        tags.add(tag);
+    }
+
+
+    public void removeTag(Tag tag) {
+        tags.remove(tag);
     }
 
 
