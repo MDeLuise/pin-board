@@ -1,6 +1,7 @@
 package com.github.mdeluise.pinboard.tag;
 
-import com.github.mdeluise.pinboard.common.CrudController;
+import com.github.mdeluise.pinboard.common.AbstractCrudController;
+import com.github.mdeluise.pinboard.common.EntityBucket;
 import com.github.mdeluise.pinboard.page.Page;
 import com.github.mdeluise.pinboard.page.PageDTO;
 import com.github.mdeluise.pinboard.page.PageDTOConverter;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
@@ -25,16 +27,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/tag")
 @Tag(name = "Tag", description = "Endpoints for operations on tags.")
-public class TagController implements CrudController<TagDTO, Long> {
-    private final TagDTOConverter tagDTOConverter;
-    private final TagService tagService;
+public class TagController extends AbstractCrudController<com.github.mdeluise.pinboard.tag.Tag, TagDTO, Long> {
     private final PageDTOConverter pageDTOConverter;
 
 
     @Autowired
     public TagController(TagDTOConverter tagDTOConverter, TagService tagService, PageDTOConverter pageDTOConverter) {
-        this.tagDTOConverter = tagDTOConverter;
-        this.tagService = tagService;
+        super(tagService, tagDTOConverter);
         this.pageDTOConverter = pageDTOConverter;
     }
 
@@ -43,10 +42,11 @@ public class TagController implements CrudController<TagDTO, Long> {
         summary = "Get all the Tags", description = "Get all the Tags."
     )
     @Override
-    public ResponseEntity<Collection<TagDTO>> findAll() {
-        Set<TagDTO> result =
-            tagService.getAll().stream().map(tagDTOConverter::convertToDTO).collect(Collectors.toSet());
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<EntityBucket<TagDTO>> findAll(
+        @RequestParam(defaultValue = "0") Integer pageNo,
+        @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(defaultValue = "id") String sortBy) {
+        return super.findAll(pageNo, pageSize, sortBy);
     }
 
 
@@ -56,8 +56,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     @Override
     public ResponseEntity<TagDTO> find(
         @Parameter(description = "The ID of the Tag on which to perform the operation") Long id) {
-        TagDTO result = tagDTOConverter.convertToDTO(tagService.get(id));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.find(id);
     }
 
 
@@ -67,12 +66,10 @@ public class TagController implements CrudController<TagDTO, Long> {
         description = "Update the details of a given Tag, according to the `id` parameter." +
                           "Please note that some fields may be readonly for integrity purposes."
     )
-    public ResponseEntity<TagDTO> update(TagDTO updatedEntity, @Parameter(
-        description = "The ID of the Tag on which to perform the operation"
-    ) Long id) {
-        TagDTO result = tagDTOConverter.convertToDTO(
-            tagService.update(id, tagDTOConverter.convertFromDTO(updatedEntity)));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<TagDTO> update(
+        TagDTO updatedEntity,
+        @Parameter(description = "The ID of the Tag on which to perform the operation") Long id) {
+        return super.update(updatedEntity, id);
     }
 
 
@@ -81,7 +78,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     )
     @Override
     public void remove(@Parameter(description = "The ID of the Tag on which to perform the operation") Long id) {
-        tagService.remove(id);
+        super.remove(id);
     }
 
 
@@ -90,8 +87,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     )
     @Override
     public ResponseEntity<TagDTO> save(TagDTO entityToSave) {
-        TagDTO result = tagDTOConverter.convertToDTO(tagService.save(tagDTOConverter.convertFromDTO(entityToSave)));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.save(entityToSave);
     }
 
 
@@ -103,7 +99,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     public ResponseEntity<Collection<PageDTO>> getAllPages(@PathVariable("tagIds") List<Long> tagIds) {
         Collection<Page> pages = new HashSet<>();
         for (Long tagId : tagIds) {
-            pages.addAll(tagService.get(tagId).getPages());
+            pages.addAll(service.get(tagId).getPages());
         }
         Set<PageDTO> result = pages.stream().map(pageDTOConverter::convertToDTO).collect(Collectors.toSet());
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -117,7 +113,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     @PostMapping("/{tagIds}/add-to-page/{pageIds}")
     public ResponseEntity<String> addTagsToPages(
         @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageIds") List<Long> pageIds) {
-        tagService.addTagsToPages(tagId, pageIds);
+        ((TagService) service).addTagsToPages(tagId, pageIds);
         return new ResponseEntity<>("Tag(s) successfully added to page(s).", HttpStatus.OK);
     }
 
@@ -129,7 +125,7 @@ public class TagController implements CrudController<TagDTO, Long> {
     @PostMapping("/{tagIds}/remove-from-page/{pageIds}")
     public ResponseEntity<String> removeTagsFromPages(
         @PathVariable("tagIds") List<Long> tagId, @PathVariable("pageIds") List<Long> pageIds) {
-        tagService.removeTagsFromPages(tagId, pageIds);
+        ((TagService) service).removeTagsFromPages(tagId, pageIds);
         return new ResponseEntity<>("Tag(s) successfully removed from page(s).", HttpStatus.OK);
     }
 }

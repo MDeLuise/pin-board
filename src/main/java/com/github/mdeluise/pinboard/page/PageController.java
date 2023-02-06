@@ -1,6 +1,7 @@
 package com.github.mdeluise.pinboard.page;
 
-import com.github.mdeluise.pinboard.common.CrudController;
+import com.github.mdeluise.pinboard.common.AbstractCrudController;
+import com.github.mdeluise.pinboard.common.EntityBucket;
 import com.github.mdeluise.pinboard.page.body.PageBodyDTO;
 import com.github.mdeluise.pinboard.page.body.PageBodyDTOConverter;
 import com.github.mdeluise.pinboard.page.body.PageBodyService;
@@ -13,18 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/page")
 @Tag(name = "Page", description = "Endpoints for operations on pages.")
-public class PageController implements CrudController<PageDTO, Long> {
-    private final PageDTOConverter pageDtoConverter;
-    private final PageService pageService;
+public class PageController extends AbstractCrudController<Page, PageDTO, Long> {
     private final PageBodyService pageBodyService;
     private final PageBodyDTOConverter pageBodyDtoConverter;
 
@@ -32,8 +28,7 @@ public class PageController implements CrudController<PageDTO, Long> {
     @Autowired
     public PageController(PageDTOConverter pageDtoConverter, PageService pageService, PageBodyService pageBodyService,
                           PageBodyDTOConverter pageBodyDtoConverter) {
-        this.pageDtoConverter = pageDtoConverter;
-        this.pageService = pageService;
+        super(pageService, pageDtoConverter);
         this.pageBodyService = pageBodyService;
         this.pageBodyDtoConverter = pageBodyDtoConverter;
     }
@@ -44,10 +39,11 @@ public class PageController implements CrudController<PageDTO, Long> {
         description = "Get all the Pages."
     )
     @Override
-    public ResponseEntity<Collection<PageDTO>> findAll() {
-        Set<PageDTO> result =
-            pageService.getAll().stream().map(pageDtoConverter::convertToDTO).collect(Collectors.toSet());
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<EntityBucket<PageDTO>> findAll(
+        @RequestParam(defaultValue = "0") Integer pageNo,
+        @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(defaultValue = "id") String sortBy) {
+        return super.findAll(pageNo, pageSize, sortBy);
     }
 
 
@@ -58,8 +54,7 @@ public class PageController implements CrudController<PageDTO, Long> {
     @Override
     public ResponseEntity<PageDTO> find(
         @Parameter(description = "The ID of the Page on which to perform the operation") Long id) {
-        PageDTO result = pageDtoConverter.convertToDTO(pageService.get(id));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.find(id);
     }
 
 
@@ -72,9 +67,7 @@ public class PageController implements CrudController<PageDTO, Long> {
     public ResponseEntity<PageDTO> update(
         PageDTO updatedEntity,
         @Parameter(description = "The ID of the Page on which to perform the operation") Long id) {
-        PageDTO result = pageDtoConverter.convertToDTO(
-            pageService.update(id, pageDtoConverter.convertFromDTO(updatedEntity)));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.update(updatedEntity, id);
     }
 
 
@@ -84,7 +77,7 @@ public class PageController implements CrudController<PageDTO, Long> {
     )
     @Override
     public void remove(@Parameter(description = "The ID of the Page on which to perform the operation") Long id) {
-        pageService.remove(id);
+        super.remove(id);
     }
 
 
@@ -94,8 +87,7 @@ public class PageController implements CrudController<PageDTO, Long> {
     )
     @Override
     public ResponseEntity<PageDTO> save(PageDTO entityToSave) {
-        PageDTO result = pageDtoConverter.convertToDTO(pageService.save(pageDtoConverter.convertFromDTO(entityToSave)));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.save(entityToSave);
     }
 
 
@@ -105,8 +97,25 @@ public class PageController implements CrudController<PageDTO, Long> {
     )
     @GetMapping("/{id}/body")
     public ResponseEntity<PageBodyDTO> getThePageBody(@PathVariable("id") Long pageId) {
-        Page page = pageService.get(pageId);
+        Page page = service.get(pageId);
         PageBodyDTO result = pageBodyDtoConverter.convertToDTO(pageBodyService.get(page.getId()));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    @Operation(
+        summary = "Get the Page based on title",
+        description = "Get the Pages starting with the given title, according to the `title` parameter"
+    )
+    @GetMapping("/title/{title}")
+    public ResponseEntity<org.springframework.data.domain.Page<PageDTO>> getThePageBody(
+        @RequestParam(defaultValue = "0") Integer pageNo,
+        @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @PathVariable("title") String title) {
+        org.springframework.data.domain.Page<PageDTO> result =
+            ((PageService) service).getPagesWithTitleLike(pageNo, pageSize, sortBy, title)
+                                   .map(abstractDTOConverter::convertToDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

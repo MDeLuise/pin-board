@@ -6,11 +6,13 @@ import com.github.mdeluise.pinboard.authorization.permission.PType;
 import com.github.mdeluise.pinboard.authorization.permission.Permission;
 import com.github.mdeluise.pinboard.authorization.permission.PermissionService;
 import com.github.mdeluise.pinboard.common.AbstractCrudService;
-import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import com.github.mdeluise.pinboard.exception.InvalidPageException;
 import com.github.mdeluise.pinboard.scraper.PageScraper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Collection;
 
 @Service
 public class PageService extends AbstractCrudService<Page, Long> {
@@ -40,23 +41,22 @@ public class PageService extends AbstractCrudService<Page, Long> {
 
     @Override
     @PostFilter("hasRole('ADMIN') or hasAuthority('read:page:' + filterObject.id)")
-    public Collection<Page> getAll() {
-        return ((PageRepository) repository).findAll();
+    public org.springframework.data.domain.Page<Page> getAll(int pageNo, int pageSize, String sortBy) {
+        return super.getAll(pageNo, pageSize, sortBy);
     }
 
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('read:page:' + #id)")
     public Page get(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return super.get(id);
     }
 
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('write:page:' + #id)")
     public void remove(Long id) {
-        Page toRemove = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
-        repository.delete(toRemove);
+        super.remove(id);
     }
 
 
@@ -69,7 +69,7 @@ public class PageService extends AbstractCrudService<Page, Long> {
         } catch (IOException e) {
             throw new InvalidPageException(e.getMessage());
         }
-        Page saved = repository.save(filledPage);
+        Page saved = super.save(filledPage);
 
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
@@ -96,10 +96,8 @@ public class PageService extends AbstractCrudService<Page, Long> {
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('write:page:' + #id)")
     public Page update(Long id, Page updatedEntity) {
-        Page toUpdate = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
-        toUpdate.setTitle(updatedEntity.getTitle());
-        toUpdate.setTags(updatedEntity.getTags());
-        toUpdate.setLists(updatedEntity.getLists());
+        Page toUpdate = get(id);
+        updateFields(toUpdate, updatedEntity);
         if (!toUpdate.getUrl().equals(updatedEntity.getUrl())) {
             toUpdate.setUrl(updatedEntity.getUrl());
             try {
@@ -109,5 +107,20 @@ public class PageService extends AbstractCrudService<Page, Long> {
             }
         }
         return repository.save(toUpdate);
+    }
+
+
+    @Override
+    protected void updateFields(Page toUpdate, Page updatedEntity) {
+        toUpdate.setTitle(updatedEntity.getTitle());
+        toUpdate.setTags(updatedEntity.getTags());
+        toUpdate.setLists(updatedEntity.getLists());
+    }
+
+
+    public org.springframework.data.domain.Page<Page> getPagesWithTitleLike(int pageNo, int pageSize, String sortBy,
+                                                                            String title) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return ((PageRepository) repository).findByTitleIgnoreCaseContaining(title, paging);
     }
 }

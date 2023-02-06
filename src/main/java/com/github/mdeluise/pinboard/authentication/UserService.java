@@ -4,11 +4,10 @@ import com.github.mdeluise.pinboard.common.AbstractCrudService;
 import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
 
 @Service
 public class UserService extends AbstractCrudService<User, Long> {
@@ -28,15 +27,17 @@ public class UserService extends AbstractCrudService<User, Long> {
     }
 
 
+    @Override
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
     public User get(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return super.get(id);
     }
 
 
+    @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public Collection<User> getAll() {
-        return ((UserRepository) repository).findAll();
+    public Page<User> getAll(int pageNo, int pageSize, String sortBy) {
+        return super.getAll(pageNo, pageSize, sortBy);
     }
 
 
@@ -48,31 +49,34 @@ public class UserService extends AbstractCrudService<User, Long> {
     }
 
 
+    @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
     public User update(Long id, User updatedUser) {
-        User userToModify = get(id);
-        userToModify.setUsername(updatedUser.getUsername());
-        userToModify.setPassword(updatedUser.getPassword());
-        userToModify.setRoles(updatedUser.getRoles());
-        userToModify.setPermissions(updatedUser.getPermissions());
-        return save(userToModify);
+        return super.update(id, updatedUser);
     }
 
 
+    @Override
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
     public void remove(Long id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException(id);
-        }
-        repository.deleteById(id);
+        super.remove(id);
     }
 
 
     @Override
     public User save(User entityToSave) {
         entityToSave.setPassword(encoder.encode(entityToSave.getPassword()));
-        return repository.save(entityToSave);
+        return super.save(entityToSave);
+    }
+
+
+    @Override
+    protected void updateFields(User toUpdate, User updatedEntity) {
+        toUpdate.setUsername(updatedEntity.getUsername());
+        toUpdate.setPassword(updatedEntity.getPassword());
+        toUpdate.setRoles(updatedEntity.getRoles());
+        toUpdate.setPermissions(updatedEntity.getPermissions());
     }
 
 

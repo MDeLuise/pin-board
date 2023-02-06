@@ -1,14 +1,11 @@
 package com.github.mdeluise.pinboard.page.body;
 
 import com.github.mdeluise.pinboard.common.AbstractCrudService;
-import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
 
 @Service
 public class PageBodyService extends AbstractCrudService<PageBody, Long> {
@@ -20,28 +17,22 @@ public class PageBodyService extends AbstractCrudService<PageBody, Long> {
 
 
     @Override
-    public Collection<PageBody> getAll() {
-        return ((PageBodyRepository) repository).findAll();
-    }
-
-
-    @Override
     @Cacheable(value = "bodies", key = "#id")
     public PageBody get(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return super.get(id);
     }
+
 
     @Override
     @CacheEvict(value = "bodies", key = "#id")
     public void remove(Long id) {
-        PageBody toRemove = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
-        repository.delete(toRemove);
+        super.remove(id);
     }
 
 
     @Override
     public PageBody save(PageBody entityToSave) {
-        PageBody saved = repository.save(entityToSave);
+        PageBody saved = super.save(entityToSave);
         saved.getPage().setPageBodyId(saved.getId());
         return saved;
     }
@@ -50,8 +41,12 @@ public class PageBodyService extends AbstractCrudService<PageBody, Long> {
     @Override
     @CachePut(value = "bodies", key = "#id", unless = "#result == null")
     public PageBody update(Long id, PageBody updatedEntity) {
-        PageBody toUpdate = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return super.update(id, updatedEntity);
+    }
+
+
+    @Override
+    protected void updateFields(PageBody toUpdate, PageBody updatedEntity) {
         toUpdate.setContent(updatedEntity.getContent());
-        return repository.save(toUpdate);
     }
 }

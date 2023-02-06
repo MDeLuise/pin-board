@@ -1,6 +1,7 @@
 package com.github.mdeluise.pinboard.authentication;
 
 import com.github.mdeluise.pinboard.common.CrudController;
+import com.github.mdeluise.pinboard.common.EntityBucket;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,9 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collection;
 
 @RestController
 @RequestMapping("/user")
@@ -29,11 +29,14 @@ public class UserController implements CrudController<User, Long> {
 
     @Override
     @Operation(
-        summary = "Get a single User",
+        summary = "Get all Users",
         description = "Get all the User."
     )
-    public ResponseEntity<Collection<User>> findAll() {
-        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+    public ResponseEntity<EntityBucket<User>> findAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                              @RequestParam(defaultValue = "10") Integer pageSize,
+                                              @RequestParam(defaultValue = "id") String sortBy) {
+        EntityBucket<User> result = new EntityBucket<>(userService.getAll(pageNo, pageSize, sortBy));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 

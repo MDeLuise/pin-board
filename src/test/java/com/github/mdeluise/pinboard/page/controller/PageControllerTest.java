@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -71,13 +72,14 @@ public class PageControllerTest {
         PageDTO pageDTO2 = new PageDTO();
         pageDTO2.setId(2L);
         pageDTO2.setUrl("page2");
-        Mockito.when(pageService.getAll()).thenReturn(List.of(page1, page2));
+        Mockito.when(pageService.getAll(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString()))
+               .thenReturn(new PageImpl<>(List.of(page1, page2)));
         Mockito.when(pageDTOConverter.convertToDTO(page1)).thenReturn(pageDTO1);
         Mockito.when(pageDTOConverter.convertToDTO(page2)).thenReturn(pageDTO2);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/page")).andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
-               .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)));
+               .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
+               .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)));
     }
 
 

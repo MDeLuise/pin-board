@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Schema(name = "PageBody", description = "Represents a page's body.")
 public class PageBodyDTO implements Serializable {
     @Schema(description = "ID of the body.", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;

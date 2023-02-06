@@ -19,7 +19,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -41,29 +40,28 @@ public class TagService extends AbstractCrudService<Tag, Long> {
 
     @Override
     @PostFilter("hasRole('ADMIN') or hasAuthority('read:tag:' + filterObject.id)")
-    public Collection<Tag> getAll() {
-        return ((TagRepository) repository).findAll();
+    public org.springframework.data.domain.Page<Tag> getAll(int pageNo, int pageSize, String sortBy) {
+        return super.getAll(pageNo, pageSize, sortBy);
     }
 
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('read:tag:' + #id)")
     public Tag get(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return super.get(id);
     }
 
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('write:tag:' + #id)")
     public void remove(Long id) {
-        Tag toRemove = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
-        repository.delete(toRemove);
+        super.remove(id);
     }
 
 
     @Override
     public Tag save(Tag entityToSave) {
-        Tag saved = repository.save(entityToSave);
+        Tag saved = super.save(entityToSave);
 
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
@@ -90,10 +88,17 @@ public class TagService extends AbstractCrudService<Tag, Long> {
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('write:tag:' + #id)")
     public Tag update(Long id, Tag updatedEntity) {
+        // FIXME change permission name if needed
         Tag toUpdate = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        updateFields(toUpdate, updatedEntity);
+        return repository.save(toUpdate);
+    }
+
+
+    @Override
+    protected void updateFields(Tag toUpdate, Tag updatedEntity) {
         toUpdate.setName(updatedEntity.getName());
         toUpdate.setPages(updatedEntity.getPages());
-        return repository.save(toUpdate);
     }
 
 

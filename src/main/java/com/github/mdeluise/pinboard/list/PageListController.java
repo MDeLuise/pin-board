@@ -1,6 +1,7 @@
 package com.github.mdeluise.pinboard.list;
 
-import com.github.mdeluise.pinboard.common.CrudController;
+import com.github.mdeluise.pinboard.common.AbstractCrudController;
+import com.github.mdeluise.pinboard.common.EntityBucket;
 import com.github.mdeluise.pinboard.page.Page;
 import com.github.mdeluise.pinboard.page.PageDTO;
 import com.github.mdeluise.pinboard.page.PageDTOConverter;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
@@ -25,8 +27,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/list")
 @Tag(name = "List", description = "Endpoints for operations on lists.")
-public class PageListController implements CrudController<PageListDTO, Long> {
-    private final PageListDTOConverter pageListDtoConverter;
+public class PageListController extends AbstractCrudController<PageList, PageListDTO, Long> {
     private final PageListService pageListService;
     private final PageDTOConverter pageDTOConverter;
 
@@ -34,7 +35,7 @@ public class PageListController implements CrudController<PageListDTO, Long> {
     @Autowired
     public PageListController(PageListDTOConverter pageListDtoConverter, PageListService pageListService,
                               PageDTOConverter pageDTOConverter) {
-        this.pageListDtoConverter = pageListDtoConverter;
+        super(pageListService, pageListDtoConverter);
         this.pageListService = pageListService;
         this.pageDTOConverter = pageDTOConverter;
     }
@@ -45,10 +46,11 @@ public class PageListController implements CrudController<PageListDTO, Long> {
         description = "Get all the Lists."
     )
     @Override
-    public ResponseEntity<Collection<PageListDTO>> findAll() {
-        Set<PageListDTO> result =
-            pageListService.getAll().stream().map(pageListDtoConverter::convertToDTO).collect(Collectors.toSet());
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<EntityBucket<PageListDTO>> findAll(
+        @RequestParam(defaultValue = "0") Integer pageNo,
+        @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(defaultValue = "id") String sortBy) {
+        return super.findAll(pageNo, pageSize, sortBy);
     }
 
 
@@ -59,8 +61,7 @@ public class PageListController implements CrudController<PageListDTO, Long> {
     @Override
     public ResponseEntity<PageListDTO> find(
         @Parameter(description = "The ID of the List on which to perform the operation") Long id) {
-        PageListDTO result = pageListDtoConverter.convertToDTO(pageListService.get(id));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.find(id);
     }
 
 
@@ -73,9 +74,7 @@ public class PageListController implements CrudController<PageListDTO, Long> {
     public ResponseEntity<PageListDTO> update(
         PageListDTO updatedEntity,
         @Parameter(description = "The ID of the List on which to perform the operation") Long id) {
-        PageListDTO result = pageListDtoConverter.convertToDTO(
-            pageListService.update(id, pageListDtoConverter.convertFromDTO(updatedEntity)));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.update(updatedEntity, id);
     }
 
 
@@ -85,7 +84,7 @@ public class PageListController implements CrudController<PageListDTO, Long> {
     )
     @Override
     public void remove(@Parameter(description = "The ID of the List on which to perform the operation") Long id) {
-        pageListService.remove(id);
+        super.remove(id);
     }
 
 
@@ -95,9 +94,7 @@ public class PageListController implements CrudController<PageListDTO, Long> {
     )
     @Override
     public ResponseEntity<PageListDTO> save(PageListDTO entityToSave) {
-        PageListDTO result =
-            pageListDtoConverter.convertToDTO(pageListService.save(pageListDtoConverter.convertFromDTO(entityToSave)));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return super.save(entityToSave);
     }
 
 

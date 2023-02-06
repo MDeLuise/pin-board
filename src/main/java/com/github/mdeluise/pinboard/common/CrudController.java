@@ -1,5 +1,6 @@
 package com.github.mdeluise.pinboard.common;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,13 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import jakarta.validation.Valid;
-import java.util.Collection;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface CrudController<E, I> {
     @GetMapping
-    ResponseEntity<Collection<E>> findAll();
+    ResponseEntity<EntityBucket<E>> findAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                            @RequestParam(defaultValue = "10") Integer pageSize,
+                                            @RequestParam(defaultValue = "id") String sortBy);
 
     @GetMapping("/{id}")
     ResponseEntity<E> find(@PathVariable I id);

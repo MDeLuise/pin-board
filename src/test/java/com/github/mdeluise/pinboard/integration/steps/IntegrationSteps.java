@@ -232,7 +232,7 @@ public class IntegrationSteps {
     @Then("the count of all pages is {int}")
     public void countAllPages(int expectedCount) throws Exception {
         callGet(pageEndpoint);
-        stepData.getResultActions().andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(expectedCount)));
+        stepData.getResultActions().andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(expectedCount)));
     }
 
 
@@ -257,14 +257,14 @@ public class IntegrationSteps {
     @Then("the count of all lists is {int}")
     public void countAllLists(int expectedCount) throws Exception {
         callGet(pageListEndpoint);
-        stepData.getResultActions().andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(expectedCount)));
+        stepData.getResultActions().andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(expectedCount)));
     }
 
 
     @Then("the count of all tags is {int}")
     public void countAllTags(int expectedCount) throws Exception {
         callGet(tagEndpoint);
-        stepData.getResultActions().andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(expectedCount)));
+        stepData.getResultActions().andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(expectedCount)));
     }
 
 

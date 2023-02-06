@@ -19,7 +19,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -41,29 +40,28 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
 
     @Override
     @PostFilter("hasRole('ADMIN') or hasAuthority('read:list:' + filterObject.id)")
-    public Collection<PageList> getAll() {
-        return ((PageListRepository) repository).findAll();
+    public org.springframework.data.domain.Page<PageList> getAll(int pageNo, int pageSize, String sortBy) {
+        return super.getAll(pageNo, pageSize, sortBy);
     }
 
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('read:list:' + #id)")
     public PageList get(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return super.get(id);
     }
 
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('write:list:' + #id)")
     public void remove(Long id) {
-        PageList toRemove = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
-        repository.delete(toRemove);
+        super.remove(id);
     }
 
 
     @Override
     public PageList save(PageList entityToSave) {
-        PageList saved = repository.save(entityToSave);
+        PageList saved = super.save(entityToSave);
 
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
@@ -91,10 +89,14 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('write:list:' + #id)")
     public PageList update(Long id, PageList updatedEntity) {
         // FIXME if change name then also permission (even for other entities)
-        PageList toUpdate = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return super.update(id, updatedEntity);
+    }
+
+
+    @Override
+    protected void updateFields(PageList toUpdate, PageList updatedEntity) {
         toUpdate.setPages(updatedEntity.getPages());
         toUpdate.setName(updatedEntity.getName());
-        return repository.save(toUpdate);
     }
 
 
