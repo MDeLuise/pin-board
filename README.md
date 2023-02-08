@@ -1,4 +1,6 @@
 # Pin Board
+![build status](https://github.com/MDeLuise/pin-board/actions/workflows/main.yml/badge.svg)
+
 Pin Board is a self-hosted, open source, service that makes possible to save, manage, and read articles you’ve found on the internet later.
 
 ## Why Pin Board?

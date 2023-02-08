@@ -41,8 +41,9 @@ public class PageService extends AbstractCrudService<Page, Long> {
 
     @Override
     @PostFilter("hasRole('ADMIN') or hasAuthority('read:page:' + filterObject.id)")
-    public org.springframework.data.domain.Page<Page> getAll(int pageNo, int pageSize, String sortBy) {
-        return super.getAll(pageNo, pageSize, sortBy);
+    public org.springframework.data.domain.Page<Page> getAll(int pageNo, int pageSize, String sortBy,
+                                                             Sort.Direction sortDir) {
+        return super.getAll(pageNo, pageSize, sortBy, sortDir);
     }
 
 

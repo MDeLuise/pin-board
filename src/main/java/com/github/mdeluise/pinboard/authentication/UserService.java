@@ -5,6 +5,7 @@ import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,9 @@ public class UserService extends AbstractCrudService<User, Long> {
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<User> getAll(int pageNo, int pageSize, String sortBy) {
-        return super.getAll(pageNo, pageSize, sortBy);
+    public Page<User> getAll(int pageNo, int pageSize, String sortBy,
+                             Sort.Direction sortDir) {
+        return super.getAll(pageNo, pageSize, sortBy, sortDir);
     }
 
 

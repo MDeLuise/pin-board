@@ -1,7 +1,6 @@
 package com.github.mdeluise.pinboard.list.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mdeluise.pinboard.TestEnvironment;
 import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import com.github.mdeluise.pinboard.list.PageList;
 import com.github.mdeluise.pinboard.list.PageListController;
@@ -9,19 +8,21 @@ import com.github.mdeluise.pinboard.list.PageListDTO;
 import com.github.mdeluise.pinboard.list.PageListDTOConverter;
 import com.github.mdeluise.pinboard.list.PageListService;
 import com.github.mdeluise.pinboard.page.PageDTOConverter;
-import com.github.mdeluise.pinboard.security.ApplicationSecurityConfig;
+import com.github.mdeluise.pinboard.security.apikey.ApiKeyFilter;
+import com.github.mdeluise.pinboard.security.apikey.ApiKeyRepository;
+import com.github.mdeluise.pinboard.security.apikey.ApiKeyService;
 import com.github.mdeluise.pinboard.security.jwt.JwtTokenFilter;
 import com.github.mdeluise.pinboard.security.jwt.JwtTokenUtil;
 import com.github.mdeluise.pinboard.security.jwt.JwtWebUtil;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,18 +32,21 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 @WebMvcTest(PageListController.class)
-@Import(
-    {
-        JwtTokenFilter.class,
-        JwtTokenUtil.class,
-        JwtWebUtil.class,
-        TestEnvironment.class,
-        ApplicationSecurityConfig.class,
-        ModelMapper.class
-    }
-)
+@AutoConfigureMockMvc(addFilters = false)
 @WithMockUser(roles = "ADMIN")
 public class PageListControllerTest {
+    @MockBean
+    JwtTokenFilter jwtTokenFilter;
+    @MockBean
+    JwtTokenUtil jwtTokenUtil;
+    @MockBean
+    JwtWebUtil jwtWebUtil;
+    @MockBean
+    ApiKeyFilter apiKeyFilter;
+    @MockBean
+    ApiKeyService apiKeyService;
+    @MockBean
+    ApiKeyRepository apiKeyRepository;
     @MockBean
     PageListService pageListService;
     @MockBean
@@ -52,7 +56,7 @@ public class PageListControllerTest {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
 
     @Test
@@ -69,7 +73,7 @@ public class PageListControllerTest {
         PageListDTO pageListDTO2 = new PageListDTO();
         pageListDTO2.setId(2L);
         pageListDTO2.setName("pageList2");
-        Mockito.when(pageListService.getAll(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString()))
+        Mockito.when(pageListService.getAll(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(Sort.Direction.class)))
                .thenReturn(new PageImpl<>(List.of(pageList1, pageList2)));
         Mockito.when(pageListDTOConverter.convertToDTO(pageList1)).thenReturn(pageListDTO1);
         Mockito.when(pageListDTOConverter.convertToDTO(pageList2)).thenReturn(pageListDTO2);

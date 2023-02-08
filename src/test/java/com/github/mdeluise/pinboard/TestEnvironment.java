@@ -35,10 +35,10 @@ public class TestEnvironment {
         Set<Role> adminRole = new HashSet<>();
         adminRole.add(new Role(ERole.ROLE_ADMIN));
         Set<Permission> emptyPermission = new HashSet<>();
-        User adminUser = new User("admin", passwordEncoder.encode("admin"), adminRole, emptyPermission);
-        User simpleUser = new User("user", passwordEncoder.encode("user"), emptyRole, emptyPermission);
-        User simpleUser1 = new User("user1", passwordEncoder.encode("user1"), emptyRole, emptyPermission);
-        User simpleUser2 = new User("user2", passwordEncoder.encode("user2"), emptyRole, emptyPermission);
+        User adminUser = new User(0L, "admin", passwordEncoder.encode("admin"), adminRole, emptyPermission);
+        User simpleUser = new User(1L, "user", passwordEncoder.encode("user"), emptyRole, emptyPermission);
+        User simpleUser1 = new User(2L, "user1", passwordEncoder.encode("user1"), emptyRole, emptyPermission);
+        User simpleUser2 = new User(3L, "user2", passwordEncoder.encode("user2"), emptyRole, emptyPermission);
         Collection<User> users = Set.of(adminUser, simpleUser, simpleUser1, simpleUser2);
 
         return new InMemoryUserDetailsManager() {

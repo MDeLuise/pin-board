@@ -1,5 +1,6 @@
 package com.github.mdeluise.pinboard.list;
 
+import com.github.mdeluise.pinboard.common.IdentifiedEntity;
 import com.github.mdeluise.pinboard.page.Page;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -18,14 +19,14 @@ import java.util.Set;
 
 @Entity
 @Table(name = "page_lists")
-public class PageList {
+public class PageList implements IdentifiedEntity<Long> {
     @Id
     @GenericGenerator(
-        name = "IntegrationTestIdentityGenerator",
-        strategy = "com.github.mdeluise.pinboard.common.IntegrationTestIdentityGenerator",
+        name = "CustomIdGenerator",
+        strategy = "com.github.mdeluise.pinboard.common.CustomIdGenerator",
         parameters = @org.hibernate.annotations.Parameter(name = "tableName", value = "page_lists")
     )
-    @GeneratedValue(generator = "IntegrationTestIdentityGenerator")
+    @GeneratedValue(generator = "CustomIdGenerator")
     @Column(unique = true, nullable = false)
     private Long id;
     @ManyToMany(mappedBy = "lists", cascade = CascadeType.PERSIST)
@@ -36,11 +37,13 @@ public class PageList {
     private String description;
 
 
+    @Override
     public Long getId() {
         return id;
     }
 
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

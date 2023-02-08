@@ -7,10 +7,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,10 +32,9 @@ public class UserController implements CrudController<User, Long> {
         summary = "Get all Users",
         description = "Get all the User."
     )
-    public ResponseEntity<EntityBucket<User>> findAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                              @RequestParam(defaultValue = "10") Integer pageSize,
-                                              @RequestParam(defaultValue = "id") String sortBy) {
-        EntityBucket<User> result = new EntityBucket<>(userService.getAll(pageNo, pageSize, sortBy));
+    public ResponseEntity<EntityBucket<User>> findAll(Integer pageNo, Integer pageSize, String sortBy,
+                                                      Sort.Direction sortDir) {
+        EntityBucket<User> result = new EntityBucket<>(userService.getAll(pageNo, pageSize, sortBy, sortDir));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

@@ -1,5 +1,6 @@
 package com.github.mdeluise.pinboard.security;
 
+import com.github.mdeluise.pinboard.security.apikey.ApiKeyFilter;
 import com.github.mdeluise.pinboard.security.jwt.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,13 +22,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class ApplicationSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
     private final UserDetailsService userDetailsService;
+    private final ApiKeyFilter apiKeyFilter;
 
 
     @Autowired
     public ApplicationSecurityConfig(UserDetailsService userDetailsService,
-                                     JwtTokenFilter jwtTokenFilter) {
+                                     JwtTokenFilter jwtTokenFilter, ApiKeyFilter apiKeyFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtTokenFilter = jwtTokenFilter;
+        this.apiKeyFilter = apiKeyFilter;
     }
 
 
@@ -85,6 +88,9 @@ public class ApplicationSecurityConfig {
 
         http.addFilterBefore(
             jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(
+            apiKeyFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

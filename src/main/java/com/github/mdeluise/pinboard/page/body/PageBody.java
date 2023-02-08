@@ -1,5 +1,6 @@
 package com.github.mdeluise.pinboard.page.body;
 
+import com.github.mdeluise.pinboard.common.IdentifiedEntity;
 import com.github.mdeluise.pinboard.page.Page;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,7 +15,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "pages_body")
-public class PageBody implements Serializable {
+public class PageBody implements Serializable, IdentifiedEntity<Long> {
     @Id
     private Long id;
     @Lob
@@ -35,11 +36,13 @@ public class PageBody implements Serializable {
     }
 
 
+    @Override
     public Long getId() {
         return id;
     }
 
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

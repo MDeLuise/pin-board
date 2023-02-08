@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.mdeluise.pinboard.authorization.permission.Permission;
 import com.github.mdeluise.pinboard.authorization.role.Role;
+import com.github.mdeluise.pinboard.common.IdentifiedEntity;
+import com.github.mdeluise.pinboard.security.apikey.ApiKey;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -22,10 +25,10 @@ import java.util.Set;
 
 @Entity(name = "user")
 @Table(name = "application_users")
-public class User {
+public class User implements IdentifiedEntity<Long> {
     @Id
     @GeneratedValue
-    private long id;
+    private Long id;
     @Column(unique = true)
     @NotEmpty
     @Size(min = 3, max = 20)
@@ -56,9 +59,12 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "permissions_id")
     )
     private Set<Permission> permissions = new HashSet<>();
+    @OneToMany(mappedBy = "user")
+    private Set<ApiKey> apiKeys = new HashSet<>();
 
 
-    public User(String username, String password, Set<Role> roles, Set<Permission> permissions) {
+    public User(Long id, String username, String password, Set<Role> roles, Set<Permission> permissions) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.roles = roles;
@@ -91,12 +97,14 @@ public class User {
     }
 
 
-    public long getId() {
+    @Override
+    public Long getId() {
         return id;
     }
 
 
-    public void setId(long id) {
+    @Override
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -138,6 +146,26 @@ public class User {
 
     public void removeRole(Role role) {
         roles.remove(role);
+    }
+
+
+    public Set<ApiKey> getApiKeys() {
+        return apiKeys;
+    }
+
+
+    public void setApiKeys(Set<ApiKey> apiKeys) {
+        this.apiKeys = apiKeys;
+    }
+
+
+    public void addApiKey(ApiKey apiKey) {
+        apiKeys.add(apiKey);
+    }
+
+
+    public void removeApiKey(ApiKey apiKey) {
+        apiKeys.remove(apiKey);
     }
 
 

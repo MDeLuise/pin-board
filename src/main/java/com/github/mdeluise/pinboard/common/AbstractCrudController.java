@@ -1,9 +1,10 @@
 package com.github.mdeluise.pinboard.common;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public abstract class AbstractCrudController<E, D, I> implements CrudController<D, I> {
+public abstract class AbstractCrudController<E extends IdentifiedEntity<I>, D, I> implements CrudController<D, I> {
     protected final AbstractCrudService<E, I> service;
     protected final AbstractDTOConverter<E, D> abstractDTOConverter;
 
@@ -16,9 +17,9 @@ public abstract class AbstractCrudController<E, D, I> implements CrudController<
 
 
     @Override
-    public ResponseEntity<EntityBucket<D>> findAll(Integer pageNo, Integer pageSize, String sortBy) {
+    public ResponseEntity<EntityBucket<D>> findAll(Integer pageNo, Integer pageSize, String sortBy, Sort.Direction sortDir) {
         EntityBucket<D> result =
-            new EntityBucket<>(service.getAll(pageNo, pageSize, sortBy).map(abstractDTOConverter::convertToDTO));
+            new EntityBucket<>(service.getAll(pageNo, pageSize, sortBy, sortDir).map(abstractDTOConverter::convertToDTO));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

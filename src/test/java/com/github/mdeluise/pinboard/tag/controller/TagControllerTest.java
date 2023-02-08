@@ -1,10 +1,11 @@
 package com.github.mdeluise.pinboard.tag.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mdeluise.pinboard.TestEnvironment;
 import com.github.mdeluise.pinboard.exception.EntityNotFoundException;
 import com.github.mdeluise.pinboard.page.PageDTOConverter;
-import com.github.mdeluise.pinboard.security.ApplicationSecurityConfig;
+import com.github.mdeluise.pinboard.security.apikey.ApiKeyFilter;
+import com.github.mdeluise.pinboard.security.apikey.ApiKeyRepository;
+import com.github.mdeluise.pinboard.security.apikey.ApiKeyService;
 import com.github.mdeluise.pinboard.security.jwt.JwtTokenFilter;
 import com.github.mdeluise.pinboard.security.jwt.JwtTokenUtil;
 import com.github.mdeluise.pinboard.security.jwt.JwtWebUtil;
@@ -16,12 +17,12 @@ import com.github.mdeluise.pinboard.tag.TagService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,18 +32,21 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 @WebMvcTest(TagController.class)
-@Import(
-    {
-        JwtTokenFilter.class,
-        JwtTokenUtil.class,
-        JwtWebUtil.class,
-        TestEnvironment.class,
-        ApplicationSecurityConfig.class,
-        ModelMapper.class
-    }
-)
+@AutoConfigureMockMvc(addFilters = false)
 @WithMockUser(roles = "ADMIN")
 public class TagControllerTest {
+    @MockBean
+    JwtTokenFilter jwtTokenFilter;
+    @MockBean
+    JwtTokenUtil jwtTokenUtil;
+    @MockBean
+    JwtWebUtil jwtWebUtil;
+    @MockBean
+    ApiKeyFilter apiKeyFilter;
+    @MockBean
+    ApiKeyService apiKeyService;
+    @MockBean
+    ApiKeyRepository apiKeyRepository;
     @MockBean
     TagService tagService;
     @MockBean
@@ -52,7 +56,7 @@ public class TagControllerTest {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
 
     @Test
@@ -69,7 +73,7 @@ public class TagControllerTest {
         TagDTO tagDTO2 = new TagDTO();
         tagDTO2.setId(2L);
         tagDTO2.setName("tag2");
-        Mockito.when(tagService.getAll(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString()))
+        Mockito.when(tagService.getAll(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(Sort.Direction.class)))
                .thenReturn(new PageImpl<>(List.of(tag1, tag2)));
         Mockito.when(tagDTOConverter.convertToDTO(tag1)).thenReturn(tagDTO1);
         Mockito.when(tagDTOConverter.convertToDTO(tag2)).thenReturn(tagDTO2);

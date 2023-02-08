@@ -1,5 +1,6 @@
 package com.github.mdeluise.pinboard.page;
 
+import com.github.mdeluise.pinboard.common.IdentifiedEntity;
 import com.github.mdeluise.pinboard.list.PageList;
 import com.github.mdeluise.pinboard.page.body.PageBody;
 import com.github.mdeluise.pinboard.tag.Tag;
@@ -22,14 +23,14 @@ import java.util.Set;
 
 @Entity
 @Table(name = "pages")
-public class Page implements Serializable {
+public class Page implements Serializable, IdentifiedEntity<Long> {
     @Id
     @GenericGenerator(
-        name = "IntegrationTestIdentityGenerator",
-        strategy = "com.github.mdeluise.pinboard.common.IntegrationTestIdentityGenerator",
+        name = "CustomIdGenerator",
+        strategy = "com.github.mdeluise.pinboard.common.CustomIdGenerator",
         parameters = @org.hibernate.annotations.Parameter(name = "tableName", value = "pages")
     )
-    @GeneratedValue(generator = "IntegrationTestIdentityGenerator")
+    @GeneratedValue(generator = "CustomIdGenerator")
     @Column(unique = true, nullable = false)
     private Long id;
     private String title;
@@ -70,11 +71,13 @@ public class Page implements Serializable {
     }
 
 
+    @Override
     public Long getId() {
         return id;
     }
 
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

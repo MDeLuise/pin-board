@@ -11,6 +11,7 @@ import com.github.mdeluise.pinboard.page.Page;
 import com.github.mdeluise.pinboard.page.PageService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,8 +41,9 @@ public class PageListService extends AbstractCrudService<PageList, Long> {
 
     @Override
     @PostFilter("hasRole('ADMIN') or hasAuthority('read:list:' + filterObject.id)")
-    public org.springframework.data.domain.Page<PageList> getAll(int pageNo, int pageSize, String sortBy) {
-        return super.getAll(pageNo, pageSize, sortBy);
+    public org.springframework.data.domain.Page<PageList> getAll(int pageNo, int pageSize, String sortBy,
+                                                                 Sort.Direction sortDir) {
+        return super.getAll(pageNo, pageSize, sortBy, sortDir);
     }
 
 

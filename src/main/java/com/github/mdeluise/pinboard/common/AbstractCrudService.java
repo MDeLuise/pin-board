@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
 
-public abstract class AbstractCrudService<E, I> {
+public abstract class AbstractCrudService<E extends IdentifiedEntity<I>, I> {
     protected final JpaRepository<E, I> repository;
 
 
@@ -24,8 +24,8 @@ public abstract class AbstractCrudService<E, I> {
     }
 
 
-    public Page<E> getAll(int pageNo, int pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+    public Page<E> getAll(int pageNo, int pageSize, String sortBy, Sort.Direction sortDir) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortDir, sortBy);
         return repository.findAll(paging);
     }
 

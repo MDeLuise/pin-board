@@ -7,15 +7,14 @@ import com.github.mdeluise.pinboard.page.PageDTO;
 import com.github.mdeluise.pinboard.page.PageDTOConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
@@ -26,8 +25,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/tag")
-@Tag(name = "Tag", description = "Endpoints for operations on tags.")
-public class TagController extends AbstractCrudController<com.github.mdeluise.pinboard.tag.Tag, TagDTO, Long> {
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Tag", description = "Endpoints for operations on tags.")
+public class TagController extends AbstractCrudController<Tag, TagDTO, Long> {
     private final PageDTOConverter pageDTOConverter;
 
 
@@ -42,11 +41,9 @@ public class TagController extends AbstractCrudController<com.github.mdeluise.pi
         summary = "Get all the Tags", description = "Get all the Tags."
     )
     @Override
-    public ResponseEntity<EntityBucket<TagDTO>> findAll(
-        @RequestParam(defaultValue = "0") Integer pageNo,
-        @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "id") String sortBy) {
-        return super.findAll(pageNo, pageSize, sortBy);
+    public ResponseEntity<EntityBucket<TagDTO>> findAll(Integer pageNo, Integer pageSize, String sortBy,
+                                                        Sort.Direction sortDir) {
+        return super.findAll(pageNo, pageSize, sortBy, sortDir);
     }
 
 
